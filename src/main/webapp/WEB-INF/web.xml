@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
+
+	<!--
+	1.springmvc配置ContextLoaderListener		用于创建全局的spring父容器，管理除controller层的组件
+	2.配置DispatcherServlet（可以多个），用于读取spring配置创建spring子容器，管理某些Controller层
+	每个子容器都可以有独立的HandlerMapping和viewResolver，在创建子容器时，spring的父容器会自动传入
+	到子容器中（继承）
+	3.配置编码过滤器
+	-->
+	<listener> <!--listener>filter>servlet-->
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<!--
+	context-param用于设置ContextLoaderListener的参数初始化
+	contextClass用于指定读取配置和创建spring容器的方式
+	contextConfigLocation设置spring配置文件的位置
+	-->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>com.yyj.config.SpringMybatisConfig</param-value>
+	</context-param>
+	<!--默认是读取ClassPathXmlApplicationContext，需要把contextClass改成AnnotationConfigWebApplicationContext-->
+	<context-param>
+		<param-name>contextClass</param-name>
+		<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+	</context-param>
+
+	<!--创建子容器-->
+	<servlet>
+		<servlet-name>springmvc</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<!--servlet范围内的参数初始化，只能通过servlet中的init()方法获得-->
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>com.yyj.config.SpringMvcConfig</param-value>
+		</init-param>
+		<init-param>
+			<param-name>contextClass</param-name>
+			<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>springmvc</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+	<!--配置编码过滤器-->
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+</web-app>
